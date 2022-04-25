@@ -59,6 +59,17 @@ class Google2fa extends Tool
         return view('nova-google2fa::register', $data);
     }
 
+    /**
+     * Build the menu that renders the navigation links for the tool.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return mixed
+     */
+    public function menu(Request $request)
+    {
+        return null;
+    }
+
     private function isRecoveryValid($recover, $recoveryHashes)
     {
         foreach ($recoveryHashes as $recoveryHash) {
