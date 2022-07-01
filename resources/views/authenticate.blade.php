@@ -34,7 +34,7 @@
 <div class="h-full">
     <div class="px-view py-view mx-auto">
         <div class="mx-auto py-8 max-w-sm text-center text-90">
-            @include('nova::partials.logo')
+            
         </div>
 
         <form id="authenticate_form" class="bg-white shadow rounded-lg p-8 max-w-xl mx-auto" method="POST"
@@ -69,7 +69,7 @@
                     <div id="secret_div">
                         <label class="block font-bold mb-2" for="co">One Time Password</label>
                         <input class="form-control form-input form-input-bordered w-full" id="secret" type="number"
-                               name="secret" value="" onkeyup="checkAutoSubmit(this)" autofocus="">
+                               name="one_time_password" value="" onkeyup="checkAutoSubmit(this)" autofocus="">
                     </div>
                     <div id="recover_div" style="display: none;">
                         <label class="block font-bold mb-2" for="co">Recovery code</label>
