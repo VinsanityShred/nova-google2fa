@@ -1,13 +1,13 @@
 <?php
 
-namespace Lifeonscreen\Google2fa\Models;
+namespace VinsanityShred\Google2fa\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class User2fa
- * @package Lifeonscreen\Google2fa\Models
+ * @package VinsanityShred\Google2fa\Models
  */
 class User2fa extends Model
 {
@@ -21,6 +21,6 @@ class User2fa extends Model
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(config('lifeonscreen2fa.models.user'));
+        return $this->belongsTo(config('vinsanityshred2fa.models.user'));
     }
 }

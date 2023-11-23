@@ -2,9 +2,7 @@
 
 This package enforces 2FA for Laravel Nova.
 
-## Upgrade from 0.0.7 to 1.0.0
-
-Upgrade guide is available [Here](docs/upgrade_to_1.0.0.md').
+This package is forked from the abandoned package LifeOnScreen/nova-google2fa.
 
 ## Flow
 
@@ -41,13 +39,13 @@ Upgrade guide is available [Here](docs/upgrade_to_1.0.0.md').
 Install via composer
 
 ``` bash
-$ composer require lifeonscreen/nova-google2fa
+$ composer require vinsanityshred/nova-google2fa
 ```
 
 Publish config and migrations
 
 ``` bash
-$ php artisan vendor:publish --provider="Lifeonscreen\Google2fa\ToolServiceProvider"
+$ php artisan vendor:publish --provider="VinsanityShred\Google2fa\ToolServiceProvider"
 ```
 
 Run migrations
@@ -58,7 +56,7 @@ $ php artisan migrate
 
 Add relation to User model
 ```php
-use Lifeonscreen\Google2fa\Models\User2fa;
+use VinsanityShred\Google2fa\Models\User2fa;
 
 ...
 
@@ -77,7 +75,7 @@ Add middleware to `nova.config`.
     ...
     'middleware' => [
         ...
-        \Lifeonscreen\Google2fa\Http\Middleware\Google2fa::class,
+        \VinsanityShred\Google2fa\Http\Middleware\Google2fa::class,
         ...
     ],
 ]

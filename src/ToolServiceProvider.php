@@ -1,10 +1,10 @@
 <?php
 
-namespace Lifeonscreen\Google2fa;
+namespace VinsanityShred\Google2fa;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Lifeonscreen\Google2fa\Http\Middleware\Authorize;
+use VinsanityShred\Google2fa\Http\Middleware\Authorize;
 
 class ToolServiceProvider extends ServiceProvider
 {
@@ -22,8 +22,8 @@ class ToolServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             // Publishing the configuration file.
             $this->publishes([
-                __DIR__ . '/../config/lifeonscreen2fa.php' => config_path('lifeonscreen2fa.php'),
-            ], 'lifeonscreen2fa.config');
+                __DIR__ . '/../config/vinsanityshred2fa.php' => config_path('vinsanityshred2fa.php'),
+            ], 'vinsanityshred2fa.config');
 
             // Publishing the migrations.
             $this->publishes([
@@ -59,6 +59,6 @@ class ToolServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->mergeConfigFrom(__DIR__ . '/../config/lifeonscreen2fa.php', 'lifeonscreen2fa');
+        $this->mergeConfigFrom(__DIR__ . '/../config/vinsanityshred2fa.php', 'vinsanityshred2fa');
     }
 }

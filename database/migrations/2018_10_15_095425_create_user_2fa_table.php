@@ -23,7 +23,7 @@ class CreateUser2faTable extends Migration
 
             $table->foreign('user_id')
                 ->references('id')
-                ->on(config('lifeonscreen2fa.tables.user'));
+                ->on(config('vinsanityshred2fa.tables.user'));
         });
     }
 

@@ -1,19 +1,18 @@
 <?php
 
-namespace Lifeonscreen\Google2fa\Http\Middleware;
+namespace VinsanityShred\Google2fa\Http\Middleware;
 
-use Lifeonscreen\Google2fa\Google2fa;
+use Closure;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use VinsanityShred\Google2fa\Google2fa;
 
 class Authorize
 {
     /**
      * Handle the incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return \Illuminate\Http\Response
      */
-    public function handle($request, $next)
+    public function handle(Request $request, Closure $next): Response
     {
         return resolve(Google2fa::class)->authorize($request) ? $next($request) : abort(403);
     }

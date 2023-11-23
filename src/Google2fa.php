@@ -1,32 +1,27 @@
 <?php
 
-namespace Lifeonscreen\Google2fa;
+namespace VinsanityShred\Google2fa;
 
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Request;
+use Illuminate\View\View;
 use Laravel\Nova\Tool;
+use PragmaRX\Google2FA\Exceptions\IncompatibleWithGoogleAuthenticatorException;
+use PragmaRX\Google2FA\Exceptions\InvalidCharactersException;
+use PragmaRX\Google2FA\Exceptions\SecretKeyTooShortException;
 use PragmaRX\Google2FA\Google2FA as G2fa;
 use PragmaRX\Recovery\Recovery;
-use Request;
 
 class Google2fa extends Tool
 {
-    /**
-     * Perform any tasks that need to happen when the tool is booted.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-    }
-
-    /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\View\View
-     * @throws \PragmaRX\Google2FA\Exceptions\InsecureCallException
-     */
-    public function confirm()
+    public function confirm(): Factory|RedirectResponse|View
     {
         if (app(Google2FAAuthenticator::class)->isAuthenticated()) {
             auth()->user()->user2fa->google2fa_enable = 1;
@@ -36,18 +31,14 @@ class Google2fa extends Tool
         }
 
         $data['google2fa_url'] = $this->getQrCodeUrl();
-        $data['error'] = 'Secret is invalid.';
+        $data['error']         = 'Secret is invalid.';
 
         return view('google2fa::register', $data);
     }
 
-    /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     * @throws \PragmaRX\Google2FA\Exceptions\InsecureCallException
-     */
-    public function register()
+    public function register(): Factory|View
     {
-        $writer = new Writer(
+        new Writer(
             new ImageRenderer(
                 new RendererStyle(400),
                 new SvgImageBackEnd()
@@ -59,7 +50,7 @@ class Google2fa extends Tool
         return view('google2fa::register', $data);
     }
 
-    private function isRecoveryValid($recover, $recoveryHashes)
+    private function isRecoveryValid($recover, $recoveryHashes): bool
     {
         foreach ($recoveryHashes as $recoveryHash) {
             if (password_verify($recover, $recoveryHash)) {
@@ -71,9 +62,11 @@ class Google2fa extends Tool
     }
 
     /**
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
+     * @throws IncompatibleWithGoogleAuthenticatorException
+     * @throws SecretKeyTooShortException
+     * @throws InvalidCharactersException
      */
-    public function authenticate()
+    public function authenticate(): ResponseFactory|Factory|RedirectResponse|Response|View
     {
         if ($recover = Request::get('recover')) {
             if ($this->isRecoveryValid($recover, json_decode(auth()->user()->user2fa->recovery, true)) === false) {
@@ -82,27 +75,27 @@ class Google2fa extends Tool
                 return view('google2fa::authenticate', $data);
             }
 
-            $google2fa = new G2fa();
-            $recovery = new Recovery();
-            $secretKey = $google2fa->generateSecretKey();
+            $google2fa        = new G2fa();
+            $recovery         = new Recovery();
+            $secretKey        = $google2fa->generateSecretKey();
             $data['recovery'] = $recovery
-                ->setCount(config('lifeonscreen2fa.recovery_codes.count'))
-                ->setBlocks(config('lifeonscreen2fa.recovery_codes.blocks'))
-                ->setChars(config('lifeonscreen2fa.recovery_codes.chars_in_block'))
+                ->setCount(config('vinsanityshred2fa.recovery_codes.count'))
+                ->setBlocks(config('vinsanityshred2fa.recovery_codes.blocks'))
+                ->setChars(config('vinsanityshred2fa.recovery_codes.chars_in_block'))
                 ->toArray();
 
             $recoveryHashes = $data['recovery'];
             array_walk($recoveryHashes, function (&$value) {
-                $value = password_hash($value, config('lifeonscreen2fa.recovery_codes.hashing_algorithm'));
+                $value = password_hash($value, config('vinsanityshred2fa.recovery_codes.hashing_algorithm'));
             });
 
-            $user2faModel = config('lifeonscreen2fa.models.user2fa');
+            $user2faModel = config('vinsanityshred2fa.models.user2fa');
 
-            $user2faModel::where('user_id', auth()->user()->id)->delete();
-            $user2fa = new $user2faModel();
-            $user2fa->user_id = auth()->user()->id;
+            $user2faModel::where('user_id', auth()->user()->getKey())->delete();
+            $user2fa                   = new $user2faModel();
+            $user2fa->user_id          = auth()->user()->getKey();
             $user2fa->google2fa_secret = $secretKey;
-            $user2fa->recovery = json_encode($recoveryHashes);
+            $user2fa->recovery         = json_encode($recoveryHashes);
             $user2fa->save();
 
             return response(view('google2fa::recovery', $data));
@@ -117,7 +110,7 @@ class Google2fa extends Tool
         return view('google2fa::authenticate', $data);
     }
 
-    protected function getQrCodeUrl()
+    protected function getQrCodeUrl(): string
     {
         $writer = new Writer(
             new ImageRenderer(
@@ -127,11 +120,18 @@ class Google2fa extends Tool
         );
 
         return 'data:image/svg+xml;base64, ' . base64_encode(
-                $writer->writeString((new G2fa)->getQRCodeUrl(
-                    config('app.name'),
-                    auth()->user()->email,
-                    auth()->user()->user2fa->google2fa_secret
-                ))
+                $writer->writeString(
+                    (new G2fa)->getQRCodeUrl(
+                        config('app.name'),
+                        auth()->user()->email,
+                        auth()->user()->user2fa->google2fa_secret
+                    )
+                )
             );
+    }
+
+    public function menu(\Illuminate\Http\Request $request)
+    {
+        //
     }
 }

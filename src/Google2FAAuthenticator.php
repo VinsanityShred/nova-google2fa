@@ -1,13 +1,13 @@
 <?php
 
-namespace Lifeonscreen\Google2fa;
+namespace VinsanityShred\Google2fa;
 
 use Exception;
 use PragmaRX\Google2FALaravel\Support\Authenticator;
 
 /**
  * Class Google2FAAuthenticator
- * @package Lifeonscreen\Google2fa
+ * @package VinsanityShred\Google2fa
  */
 class Google2FAAuthenticator extends Authenticator
 {

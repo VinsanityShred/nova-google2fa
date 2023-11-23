@@ -8,7 +8,7 @@ Copy code bellow to migrations folder and run migrations:
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Lifeonscreen\Google2fa\Models\User2fa;
+use VinsanityShred\Google2fa\Models\User2fa;
 
 class HashGoogle2faRecoveryCodes extends Migration
 {
@@ -25,7 +25,7 @@ class HashGoogle2faRecoveryCodes extends Migration
         foreach ($users2fa as $user2fa) {
             $recoveryCodes = json_decode($user2fa->recovery);
             array_walk($recoveryCodes, function (&$value) {
-                $value = password_hash($value, config('lifeonscreen2fa.recovery_codes.hashing_algorithm'));
+                $value = password_hash($value, config('vinsanityshred2fa.recovery_codes.hashing_algorithm'));
             });
             $user2fa->recovery = json_encode($recoveryCodes);
             $user2fa->save();
