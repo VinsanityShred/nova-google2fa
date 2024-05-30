@@ -33,10 +33,10 @@ class Google2fa
             return $next($request);
         }
         $authenticator = app(Google2FAAuthenticator::class)->boot($request);
-        if (auth()->guest() || $authenticator->isAuthenticated()) {
+        if (auth('nova')->guest() || $authenticator->isAuthenticated()) {
             return $next($request);
         }
-        if (empty(auth()->user()->user2fa) || auth()->user()->user2fa->google2fa_enable === 0) {
+        if (empty(auth('nova')->user()->user2fa) || auth('nova')->user()->user2fa->google2fa_enable === 0) {
             $google2fa        = new G2fa();
             $recovery         = new Recovery();
             $secretKey        = $google2fa->generateSecretKey();
@@ -47,10 +47,10 @@ class Google2fa
                 ->toArray();
 
             $user2faModel = config('vinsanityshred2fa.models.user2fa');
-            $user2faModel::where('user_id', auth()->user()->getKey())->delete();
+            $user2faModel::where('user_id', auth('nova')->user()->getKey())->delete();
 
             $user2fa                   = new $user2faModel();
-            $user2fa->user_id          = auth()->user()->getKey();
+            $user2fa->user_id          = auth('nova')->user()->getKey();
             $user2fa->google2fa_secret = $secretKey;
             $user2fa->recovery         = json_encode($data['recovery']);
             $user2fa->save();

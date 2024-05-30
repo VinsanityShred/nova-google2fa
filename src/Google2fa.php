@@ -24,8 +24,8 @@ class Google2fa extends Tool
     public function confirm(): Factory|RedirectResponse|View
     {
         if (app(Google2FAAuthenticator::class)->isAuthenticated()) {
-            auth()->user()->user2fa->google2fa_enable = 1;
-            auth()->user()->user2fa->save();
+            auth('nova')->user()->user2fa->google2fa_enable = 1;
+            auth('nova')->user()->user2fa->save();
 
             return response()->redirectTo(config('nova.path'));
         }
@@ -69,7 +69,7 @@ class Google2fa extends Tool
     public function authenticate(): ResponseFactory|Factory|RedirectResponse|Response|View
     {
         if ($recover = Request::get('recover')) {
-            if ($this->isRecoveryValid($recover, json_decode(auth()->user()->user2fa->recovery, true)) === false) {
+            if ($this->isRecoveryValid($recover, json_decode(auth('nova')->user()->user2fa->recovery, true)) === false) {
                 $data['error'] = 'Recovery key is invalid.';
 
                 return view('google2fa::authenticate', $data);
@@ -91,9 +91,9 @@ class Google2fa extends Tool
 
             $user2faModel = config('vinsanityshred2fa.models.user2fa');
 
-            $user2faModel::where('user_id', auth()->user()->getKey())->delete();
+            $user2faModel::where('user_id', auth('nova')->user()->getKey())->delete();
             $user2fa                   = new $user2faModel();
-            $user2fa->user_id          = auth()->user()->getKey();
+            $user2fa->user_id          = auth('nova')->user()->getKey();
             $user2fa->google2fa_secret = $secretKey;
             $user2fa->recovery         = json_encode($recoveryHashes);
             $user2fa->save();
@@ -123,8 +123,8 @@ class Google2fa extends Tool
                 $writer->writeString(
                     (new G2fa)->getQRCodeUrl(
                         config('app.name'),
-                        auth()->user()->email,
-                        auth()->user()->user2fa->google2fa_secret
+                        auth('nova')->user()->email,
+                        auth('nova')->user()->user2fa->google2fa_secret
                     )
                 )
             );
